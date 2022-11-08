@@ -1,0 +1,43 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.express as px 
+##plot the data on the worldmap
+
+data_set= pd.read_csv("covid_19_clean_complete.csv")
+data_set.drop(['Province/State'],axis=1,inplace=True);
+data_set= pd.read_csv("covid_19_clean_complete.csv",parse_dates=['Date'])
+data_set.drop(['Province/State'],axis=1,inplace=True);
+data=data_set.rename(columns={"Country/Region":"Country"},inplace=True)
+
+top = data_set[data_set['Date']==data_set['Date'].max()]
+world=top.groupby('Country')["Confirmed","Deaths","Recovered","Active"].sum()
+world.reset_index(inplace=True)
+
+##Plot data on worldmap
+world1=px.choropleth(world,locations='Country',
+                        locationmode='country names',
+                        color_continuous_scale='blues',
+                        color='Active',
+                        title="Countries with Active Cases",range_color=[1,200000])
+                        
+world1.show()
+plt.savefig('map.jpg')
+
+max_active=world['Active'].max()
+max_active
+x=world[['Country']][world.Active==world.Active.max()]
+y=x.iat[0,0]
+y
+
+#notifications
+##install plyer
+from plyer import notification
+def notifyMe(title,message):
+    notification.notify(
+         title=title,
+         message=message,
+         app_icon="C:/Users/SOWMYA SURAPANENI/Downloads/icon.ico" ,
+         timeout=30
+    )
+if __name__=="__main__":
+    notifyMe("WARNING !!!\n"+y,"Highest Active Cases in the World: "+str(max_active)+"\n\n Let's take preventive measures and inform our kith & kin ")
